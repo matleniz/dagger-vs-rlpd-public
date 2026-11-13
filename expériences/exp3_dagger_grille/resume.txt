@@ -1,0 +1,76 @@
+
+t1_lighthouse  (graines 5, fin 20185 pas, 608 s)
+  lighthouse             fin : 5/5 finis, tour 412 [412-412]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 2/5 finis, tour 575 [547-603]    | >=5000 pas : 35/65 finis
+  scotland               fin : 5/5 finis, tour 611 [575-632]    | >=5000 pas : 65/65 finis
+
+t3_lighthouse  (graines 5, fin 20113 pas, 830 s)
+  lighthouse             fin : 5/5 finis, tour 401 [400-404]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 0/5 finis, tour -                | >=5000 pas : 1/65 finis
+  scotland               fin : 2/5 finis, tour 692 [614-770]    | >=5000 pas : 3/65 finis
+
+t4_2pistes  (graines 5, fin 20264 pas, 566 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 65/65 finis
+  snowtuxpeak            fin : 5/5 finis, tour 466 [466-466]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 4/5 finis, tour 542 [541-544]    | >=5000 pas : 56/65 finis
+  scotland               fin : 5/5 finis, tour 576 [576-582]    | >=5000 pas : 65/65 finis
+
+t4_4pistes  (graines 5, fin 20592 pas, 776 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 62/62 finis
+  snowtuxpeak            fin : 5/5 finis, tour 466 [466-467]    | >=5000 pas : 62/62 finis
+  cornfield_crossing     fin : 5/5 finis, tour 632 [610-664]    | >=5000 pas : 62/62 finis
+  abyss                  fin : 5/5 finis, tour 585 [585-614]    | >=5000 pas : 61/62 finis
+  hacienda               fin : 5/5 finis, tour 544 [542-547]    | >=5000 pas : 55/62 finis
+  scotland               fin : 5/5 finis, tour 587 [576-600]    | >=5000 pas : 46/62 finis
+
+t4_8pistes  (graines 5, fin 20177 pas, 992 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 61/61 finis
+  snowtuxpeak            fin : 5/5 finis, tour 466 [465-467]    | >=5000 pas : 61/61 finis
+  cornfield_crossing     fin : 5/5 finis, tour 648 [610-671]    | >=5000 pas : 61/61 finis
+  abyss                  fin : 5/5 finis, tour 585 [584-600]    | >=5000 pas : 61/61 finis
+  candela_city           fin : 5/5 finis, tour 488 [487-488]    | >=5000 pas : 61/61 finis
+  cocoa_temple           fin : 5/5 finis, tour 589 [589-607]    | >=5000 pas : 61/61 finis
+  minigolf               fin : 5/5 finis, tour 417 [391-427]    | >=5000 pas : 60/61 finis
+  xr591                  fin : 3/5 finis, tour 639 [638-672]    | >=5000 pas : 50/61 finis
+  hacienda               fin : 3/5 finis, tour 543 [542-544]    | >=5000 pas : 52/61 finis
+  scotland               fin : 5/5 finis, tour 574 [574-577]    | >=5000 pas : 57/61 finis
+
+t4_abyss  (graines 5, fin 20595 pas, 682 s)
+  abyss                  fin : 5/5 finis, tour 585 [585-585]    | >=5000 pas : 57/57 finis
+  hacienda               fin : 0/5 finis, tour -                | >=5000 pas : 0/57 finis
+  scotland               fin : 0/5 finis, tour -                | >=5000 pas : 6/57 finis
+
+t4_cornfield_crossing  (graines 5, fin 20424 pas, 592 s)
+  cornfield_crossing     fin : 5/5 finis, tour 616 [610-639]    | >=5000 pas : 55/55 finis
+  hacienda               fin : 4/5 finis, tour 536 [530-539]    | >=5000 pas : 43/55 finis
+  scotland               fin : 4/5 finis, tour 600 [581-748]    | >=5000 pas : 45/55 finis
+
+t4_lighthouse  (graines 5, fin 20335 pas, 569 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 5/5 finis, tour 543 [541-543]    | >=5000 pas : 65/65 finis
+  scotland               fin : 5/5 finis, tour 578 [576-582]    | >=5000 pas : 65/65 finis
+
+t4_lighthouse_100k  (graines 5, fin 100015 pas, 1606 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 145/145 finis
+  hacienda               fin : 5/5 finis, tour 543 [541-544]    | >=5000 pas : 135/145 finis
+  scotland               fin : 5/5 finis, tour 578 [574-584]    | >=5000 pas : 145/145 finis
+
+t4_lighthouse_100k_demos-rlpd  (graines 5, fin 100048 pas, 1495 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 145/145 finis
+  hacienda               fin : 2/5 finis, tour 554 [547-560]    | >=5000 pas : 46/145 finis
+  scotland               fin : 5/5 finis, tour 672 [612-851]    | >=5000 pas : 127/145 finis
+
+t4_lighthouse_stats-16pistes  (graines 5, fin 20335 pas, 524 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 5/5 finis, tour 540 [540-544]    | >=5000 pas : 65/65 finis
+  scotland               fin : 5/5 finis, tour 576 [576-582]    | >=5000 pas : 65/65 finis
+
+t4_lighthouse_test-mines-sandtrack  (graines 5, fin 20335 pas, 539 s)
+  lighthouse             fin : 5/5 finis, tour 415 [415-415]    | >=5000 pas : 65/65 finis
+  mines                  fin : 5/5 finis, tour 544 [543-560]    | >=5000 pas : 65/65 finis
+  sandtrack              fin : 5/5 finis, tour 588 [588-589]    | >=5000 pas : 65/65 finis
+
+t4_snowtuxpeak  (graines 5, fin 20041 pas, 566 s)
+  snowtuxpeak            fin : 5/5 finis, tour 466 [466-466]    | >=5000 pas : 65/65 finis
+  hacienda               fin : 1/5 finis, tour 545 [545-545]    | >=5000 pas : 30/65 finis
+  scotland               fin : 5/5 finis, tour 580 [573-607]    | >=5000 pas : 65/65 finis

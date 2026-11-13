@@ -1,0 +1,38 @@
+{
+ "method": "dagger",
+ "commit": "ead5a04",
+ "host": "SurfaceMat",
+ "name": "t4_4pistes",
+ "seed": 0,
+ "steps": 20000,
+ "team": 4,
+ "tracks": [
+  "lighthouse",
+  "snowtuxpeak",
+  "cornfield_crossing",
+  "abyss"
+ ],
+ "test_tracks": [
+  "hacienda",
+  "scotland"
+ ],
+ "demos": [
+  "data/team4_lighthouse_n0.0.npz",
+  "data/team4_snowtuxpeak_n0.0.npz",
+  "data/team4_cornfield_crossing_n0.0.npz",
+  "data/team4_abyss_n0.0.npz"
+ ],
+ "stats": null,
+ "eval_every": 5000,
+ "eval_early": 500,
+ "early_until": 10000,
+ "eval_episodes": 1,
+ "threads": 1,
+ "out": null,
+ "lr": 0.001,
+ "batch": 256,
+ "init_steps": 1000,
+ "grad_steps": 200,
+ "beta0": 0.5,
+ "beta_decay": 0.5
+}

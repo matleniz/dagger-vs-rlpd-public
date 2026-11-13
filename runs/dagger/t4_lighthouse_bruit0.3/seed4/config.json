@@ -1,0 +1,33 @@
+{
+ "method": "dagger",
+ "commit": "a912ae7",
+ "host": "SurfaceMat",
+ "name": "t4_lighthouse_bruit0.3",
+ "seed": 4,
+ "steps": 20000,
+ "team": 4,
+ "tracks": [
+  "lighthouse"
+ ],
+ "test_tracks": [
+  "hacienda",
+  "scotland"
+ ],
+ "demos": [
+  "data/team4_lighthouse_n0.0.npz"
+ ],
+ "stats": null,
+ "eval_every": 5000,
+ "eval_early": 500,
+ "early_until": 10000,
+ "eval_episodes": 1,
+ "threads": 1,
+ "out": null,
+ "lr": 0.001,
+ "batch": 256,
+ "init_steps": 1000,
+ "grad_steps": 200,
+ "beta0": 0.5,
+ "beta_decay": 0.5,
+ "rollout_noise": 0.3
+}

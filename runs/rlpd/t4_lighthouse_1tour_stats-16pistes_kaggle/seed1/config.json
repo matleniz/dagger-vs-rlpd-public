@@ -1,0 +1,52 @@
+{
+ "method": "rlpd",
+ "commit": "",
+ "host": "8a0e5c1f5b42",
+ "name": "t4_lighthouse_1tour_stats-16pistes_kaggle",
+ "seed": 1,
+ "steps": 100000,
+ "team": 4,
+ "tracks": [
+  "lighthouse"
+ ],
+ "test_tracks": [
+  "hacienda",
+  "scotland"
+ ],
+ "demos": [
+  "data/team4_lighthouse_n0.0.npz"
+ ],
+ "stats": [
+  "data/team4_abyss_n0.0.npz",
+  "data/team4_black_forest_n0.0.npz",
+  "data/team4_candela_city_n0.0.npz",
+  "data/team4_cocoa_temple_n0.0.npz",
+  "data/team4_cornfield_crossing_n0.0.npz",
+  "data/team4_gran_paradiso_island_n0.0.npz",
+  "data/team4_lighthouse_n0.0.npz",
+  "data/team4_mines_n0.0.npz",
+  "data/team4_minigolf_n0.0.npz",
+  "data/team4_olivermath_n0.0.npz",
+  "data/team4_ravenbridge_mansion_n0.0.npz",
+  "data/team4_sandtrack_n0.0.npz",
+  "data/team4_snowmountain_n0.0.npz",
+  "data/team4_snowtuxpeak_n0.0.npz",
+  "data/team4_volcano_island_n0.0.npz",
+  "data/team4_xr591_n0.0.npz"
+ ],
+ "eval_every": 5000,
+ "eval_early": 500,
+ "early_until": 10000,
+ "eval_episodes": 1,
+ "threads": 2,
+ "out": null,
+ "lr": 0.0003,
+ "batch": 256,
+ "gamma": 0.99,
+ "tau": 0.005,
+ "alpha0": 0.1,
+ "target_entropy": -1.0,
+ "utd": 4,
+ "warmup": 500,
+ "reward_cap": 10.2
+}

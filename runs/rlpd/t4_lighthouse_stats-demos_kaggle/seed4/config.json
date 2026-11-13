@@ -1,0 +1,36 @@
+{
+ "method": "rlpd",
+ "commit": "",
+ "host": "20b14c74ab03",
+ "name": "t4_lighthouse_stats-demos_kaggle",
+ "seed": 4,
+ "steps": 100000,
+ "team": 4,
+ "tracks": [
+  "lighthouse"
+ ],
+ "test_tracks": [
+  "hacienda",
+  "scotland"
+ ],
+ "demos": [
+  "data/team4_lighthouse_n0.0.npz",
+  "data/team4_lighthouse_n0.1.npz"
+ ],
+ "stats": null,
+ "eval_every": 5000,
+ "eval_early": 500,
+ "early_until": 10000,
+ "eval_episodes": 1,
+ "threads": 2,
+ "out": null,
+ "lr": 0.0003,
+ "batch": 256,
+ "gamma": 0.99,
+ "tau": 0.005,
+ "alpha0": 0.1,
+ "target_entropy": -1.0,
+ "utd": 4,
+ "warmup": 500,
+ "reward_cap": 10.2
+}

@@ -1,0 +1,22 @@
+__pycache__
+.venv/
+.mlarena_submission
+.env
+data/
+runs/logs/
+runs/*_all.csv
+*.pth
+
+# Report : ignorer tout sauf .tex, references.bib et figures/
+report/*
+!report/*.tex
+!report/references.bib
+!report/figures/
+!report/figures/**
+
+# Notes internes de travail (non publiques) et consignes du cours
+STATE.md
+REPRISE.md
+ROADMAP.md
+tableau.excalidraw
+report/consignes/
