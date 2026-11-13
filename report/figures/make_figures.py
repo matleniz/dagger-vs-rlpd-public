@@ -14,9 +14,8 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size": 8, "axes.titlesize": 9, "axes.spines.top": False, "axes.spines.right": False,
                      "pdf.fonttype": 42, "font.family": "serif"})
 C = {"dagger": "#2a78d6", "rlpd": "#eb6834", "sac": "#1baf7a"}
-FAIL = 1500  # episode limit: an unfinished lap is counted 1500 steps
 df = pd.read_csv("runs/eval_all.csv")
-df["lot"] = df.run.str.extract(r"runs/(\w+/[^/]+)/")[0]
+df["lot"] = df.run.str.replace("\\", "/", regex=False).str.extract(r"runs/(\w+/[^/]+)/")[0]
 TEST = ["hacienda", "scotland"]
 
 
@@ -32,39 +31,61 @@ def perm_p(x, y):
     return hits / tot
 
 
-def lap_curve(lot, grid):
-    """Per seed, lap steps (FAIL if unfinished) of the last evaluation <= each grid point."""
-    g = df[(df.lot == lot) & (df.track == "lighthouse")].copy()
-    g["t"] = np.where(g.finished == 1, g.lap_steps, FAIL)
+# Figure 1: learning curve on the training track.
+# At a few checkpoints: median lap time of the seeds that finish, with the number of finishing seeds when < 5.
+MASTER = 415
+CHECKPOINTS = [1000, 2000, 3000, 5000, 10_000, 15_000, 20_000, 25_000, 50_000, 75_000, 100_000]
+CURVES = [("rlpd/t4_lighthouse_1tour_kaggle", "rlpd", "RLPD, 1 demo lap"),
+          ("rlpd/t4_lighthouse_sac_kaggle", "sac", "SAC only")]
+
+
+def checkpoint_medians(lot):
+    """(step, median lap of finishing seeds, n finishing, n seeds) at each checkpoint with >= 1 finisher."""
+    g = df[(df.lot == lot) & (df.track == "lighthouse")]
     out = []
-    for _, h in g.groupby("seed"):
-        h = h.sort_values("env_steps")
-        idx = np.searchsorted(h.env_steps.values, grid, side="right") - 1
-        out.append(np.where(idx >= 0, h.t.values[np.clip(idx, 0, None)], np.nan))
-    return np.array(out)
+    for s in CHECKPOINTS:
+        h = g[g.env_steps == s]
+        fin = h[h.finished == 1]
+        if len(fin):
+            out.append((s, fin.lap_steps.median(), len(fin), len(h)))
+    return out
 
 
-# Figure 1: learning curve on the training track
-grid = np.unique(np.r_[np.arange(415, 10_001, 50), np.arange(10_000, 100_001, 1000)])
-fig, ax = plt.subplots(figsize=(3.4, 2.3))
-for lot, key, lab in [("dagger/t4_lighthouse_100k", "dagger", "DAgger"),
-                      ("rlpd/t4_lighthouse_1tour_kaggle", "rlpd", "RLPD (1 demo lap)"),
-                      ("rlpd/t4_lighthouse_sac_kaggle", "sac", "SAC only (no demo)")]:
-    a = lap_curve(lot, grid)
-    ok = ~np.isnan(a).any(0)
-    ax.fill_between(grid[ok], np.nanmin(a[:, ok], 0), np.nanmax(a[:, ok], 0), color=C[key], alpha=.18, lw=0)
-    ax.plot(grid[ok], np.nanmedian(a[:, ok], 0), color=C[key], lw=1.4, label=lab)
-ax.axhline(415, color="0.2", ls=":", lw=.9, zorder=5)
-ax.text(1.1e5, 415, "master\n415", va="center", fontsize=7, color="0.3")
+fig, ax = plt.subplots(figsize=(3.4, 2.6))
+ax.grid(axis="y", color="0.9", lw=.6, zorder=0)
+ax.axhline(MASTER, color="0.2", ls=(0, (3, 2)), lw=.8, zorder=4)
+ax.text(430, MASTER + 10, "DAgger = master", ha="left", va="bottom", fontsize=6.5, color=C["dagger"])
+dag = df[(df.lot == "dagger/t4_lighthouse_100k") & (df.track == "lighthouse") & (df.finished == 1)]
+dag_lap = dag.lap_steps.median()
+ax.plot([415, 1e5], [dag_lap] * 2, color=C["dagger"], lw=1.6, zorder=3)
+ax.plot(415, dag_lap, "o", ms=4.5, color=C["dagger"], mec="white", mew=.8, zorder=5)
+for lot, key, lab in CURVES:
+    pts = checkpoint_medians(lot)
+    x, y = [p[0] for p in pts], [p[1] for p in pts]
+    ax.plot(x, y, color=C[key], lw=1.4, zorder=4)
+    ax.plot(x, y, "o", ms=4.5, color=C[key], mec="white", mew=.8, zorder=5)
+    for s, m, k, n in pts:
+        if k < n:
+            off, ha = ((5, 2), "left") if key == "sac" else ((-5, -9), "right")
+            ax.annotate(f"{k}/{n}", (s, m), xytext=off, textcoords="offset points", ha=ha,
+                        fontsize=6.5, color="0.35", family="monospace")
 ax.set_xscale("log")
-ax.set_xlim(400, 1e5)
-ax.set_ylim(370, 1000)
-ax.set_yticks([400, 500, 600, 700, 800, 900, 1000])
-ax.set_yticklabels(["400", "500", "600", "700", "800", "900", "$\\geq$1000"])
+ax.set_xlim(380, 1.15e5)
+ax.set_xticks([415, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5])
+ax.set_xticklabels(["415", "1k", "2k", "5k", "10k", "20k", "50k", "100k"])
+ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+ax.set_ylim(360, 1010)
+ax.set_yticks(range(400, 1001, 100))
+ax.tick_params(labelsize=7, length=0)
+ax.spines["left"].set_visible(False)
+ax.spines["bottom"].set_color("0.6")
 ax.set_xlabel("environment steps (log scale, demos included)")
-ax.set_ylabel("lap time on lighthouse (steps)")
-ax.set_title("Training track: learning curves")
-ax.legend(frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1, .98))
+ax.text(-.02, 1.03, "lap time (steps)", transform=ax.transAxes, ha="left", va="bottom", fontsize=7, color="0.3")
+handles = [plt.Line2D([], [], color=C[k], marker="o", ms=4.5, mec="white", lw=1.4) for k in ("rlpd", "sac", "dagger")]
+handles.append(plt.Line2D([], [], color="0.45", ls=(0, (3, 2)), lw=.9))
+ax.legend(handles, ["RLPD, 1 demo lap", "SAC only", "DAgger", "master team4"], frameon=False, fontsize=7,
+          loc="lower left", bbox_to_anchor=(-.02, 1.1), ncol=2, handlelength=1.8, columnspacing=1.2,
+          handletextpad=.4, borderaxespad=0)
 fig.tight_layout()
 fig.savefig("report/figures/fig1_learning.pdf", bbox_inches="tight")
 

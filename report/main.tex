@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper,twocolumn]{article}
+\documentclass[10pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -10,6 +10,7 @@
 \usepackage{graphicx}
 \graphicspath{{figures/}}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{xcolor}
 \definecolor{navyblue}{RGB}{0, 45, 110}
@@ -26,15 +27,17 @@
 \date{November 13, 2026 \quad--\quad code: \url{https://github.com/matleniz/dagger-vs-rlpd-public}}
 
 \begin{document}
-\maketitle
-
-\begin{abstract}
-We compare, from the same accessible master data, DAgger and symmetric sampling (the core of RLPD) for a single kart driving one lap of SuperTuxKart as fast as possible.
-Both methods share the same actor and the same demos, and are evaluated on a training track and on two tracks never seen during training (5 seeds each, exact permutation tests).
-Symmetric sampling makes SAC reach the master's lap time about three times sooner, but does not change the final lap time.
-RLPD ends up faster than the master on the training track (381 vs 415 steps) but generalises much worse than DAgger to unseen tracks, in 8 of our 9 paired settings.
-In our deterministic setting DAgger reduces to behaviour cloning: its aggregation loop only helps when the student is pushed off the master's trajectory.
-\end{abstract}
+\twocolumn[
+  \maketitle
+  \begin{abstract}
+  We compare, from the same accessible master data, DAgger and symmetric sampling (the core of RLPD) for a single kart driving one lap of SuperTuxKart as fast as possible.
+  Both methods share the same actor and the same demos, and are evaluated on a training track and on two tracks never seen during training (5 seeds each, exact permutation tests).
+  Symmetric sampling makes SAC reach the master's lap time \textbf{about three times sooner}, but does not change the final lap time.
+  RLPD ends up faster than the master on the training track (381 vs 415 steps) but \textbf{generalises much worse than DAgger} to unseen tracks, in \textbf{8 of our 9 paired settings}.
+  In our deterministic setting \textbf{DAgger reduces to behaviour cloning}: its aggregation loop only helps when the student is pushed off the master's trajectory.
+  \end{abstract}
+  \vspace{1.5em}
+]
 
 \section{Introduction and setting}
 \label{sec:intro}
@@ -49,9 +52,9 @@ With a single kart, the race position observation is set to zero and the opponen
 
 \paragraph{Choice of the master.}
 We compared the five available masters~\cite{pystkproject} on the 21 tracks, with full and truncated actions, and we measured how often each discrete action is chosen, the lap time lost by the truncation, the variance of the steering and the variation of the acceleration (\cref{tab:masters}).
-We keep team4 because these variations are the smallest for this team (smoothest steering, always full throttle, no discrete action at all), so the truncation does not change its behaviour.
-team2 finishes no track once truncated and team5 brakes one step out of three, so both are left out.
-team3 is the fastest but drifts 40\% of the time, which the student cannot reproduce in $\mathrm{Box}(2)$; we still use it, and team1 (jerky steering), as harder masters.
+We keep team4 at first because these variations are the smallest for this team (smoothest steering, always full throttle, no discrete action at all), so the truncation does not change its behaviour (other teams will be used afterwards). 
+We notice that team2 finishes no track once truncated and team5 brakes one step out of three, so both are left out.
+Team3 is the fastest but drifts 40\% of the time, which the student cannot reproduce in $\mathrm{Box}(2)$; we still use it, and team1 (jerky steering), as harder masters.
 Truncation mostly costs failures, not speed (team4: 3 tracks lost, $+2.2\%$ lap time on the others).
 
 \begin{table}[t]
@@ -79,7 +82,11 @@ hacienda and scotland are the test tracks everywhere: all usable masters finish 
 They are excluded from every demo and from the normalisation statistics; they are only used for evaluation.
 
 \paragraph{Reward and metric.}
-The reward is the one of the environment without the opponent terms: $r_t = \Delta d_t/10 - 0.1 + 10\cdot\mathbf{1}[\text{lap finished}]$, where $d_t$ is the distance covered along the track since the start (\texttt{overall\_distance}, summed over laps).
+The reward is the one of the environment without the opponent terms:
+\[
+  r_t = \frac{\Delta d_t}{10} - 0.1 + 10\cdot\mathbf{1}[\text{lap finished}]
+\]
+where $d_t$ is the distance covered along the track since the start (\texttt{overall\_distance}, summed over laps).
 We found an artefact at the finish line: on the last step, $d_t$ is sometimes counted twice (about 1760 instead of 880 on lighthouse), which gives a reward of about 98 instead of 10.
 The master and DAgger never trigger it (0/30 episodes), RLPD did on 15/30 episodes by crossing the line 10--15\,m off-centre: this looks like reward hacking (probable, not proven).
 The demos never exceed 10.14 per step, so during RLPD training the reward is capped at 10.2 per step; this is a deviation from the environment reward.
@@ -100,7 +107,7 @@ We chose it because it is the classic SAC actor for continuous actions~\cite{haa
 
 \paragraph{DAgger.}
 The student starts with 1000 gradient steps on the demo (this first point is plain behaviour cloning, BC). Each iteration plays one episode where the master's action is executed with probability $\beta$ (0.5, halved at each iteration) and the student's otherwise; the master labels every visited state, the data is aggregated and the student does 200 gradient steps (MSE).
-Labels taken while the master brakes (recovery, not reproducible in $\mathrm{Box}(2)$) are ignored but these steps are counted in the budget.
+When the master's full action contains a brake (it does so to get unstuck, e.g. by reversing), its $\mathrm{Box}(2)$ label is wrong, since the brake is dropped. So that state is not added to the dataset. The step is still played in the environment, so it still counts towards the budget of environment steps, the same budget RLPD is compared on.
 
 \paragraph{Symmetric sampling (RLPD).}
 We chose RLPD because symmetric sampling is at the core of the algorithm: each batch of SAC is half demos, half online data.
@@ -112,14 +119,30 @@ SAC only still uses the normalisation statistics of the team4 demo.
 \centering\small
 \caption{\textbf{Hyperparameters} (default arguments of \texttt{lab/dagger.py} and \texttt{lab/rlpd.py}).}
 \label{tab:hyper}
-\begin{tabularx}{\columnwidth}{@{}lX@{}}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lll@{}}
 \toprule
-common & actor MLP 256$\times$256 ReLU, tanh; batch 256; Adam; 5 seeds; demos counted in the budget \\
-DAgger & lr $10^{-3}$; MSE; 1000 initial steps; 200 steps per iteration; $\beta_0{=}0.5$, $\beta\leftarrow\beta/2$; 20k env steps (100k for long runs) \\
-RLPD / SAC & lr $3{\cdot}10^{-4}$; $\gamma{=}0.99$; $\tau{=}0.005$; 2 critics with LayerNorm; UTD 4; $\alpha_0{=}0.1$ learnt, target entropy $-1$; 500 online steps before updates; demo ratio 0.5 (0 for SAC only); reward cap 10.2; 100k env steps \\
-evaluation & 1 deterministic episode per track, every 500 steps up to 10k then every 5k \\
+\textbf{Setting} & \textbf{Parameter} & \textbf{Value} \\
+\midrule
+\multirow{3}{*}{common}
+  & actor      & MLP 256$\times$256 ReLU, tanh \\
+  & batch / optim & 256 / Adam \\
+  & seeds / budget & 5; demos counted \\
+\midrule
+\multirow{3}{*}{DAgger}
+  & lr / loss   & $10^{-3}$ / MSE \\
+  & schedule    & 1000 init + 200/iter, $\beta_0{=}0.5 \!\to\! \beta/2$ \\
+  & env steps   & 20k (100k for long runs) \\
+\midrule
+\multirow{4}{*}{\shortstack[l]{RLPD /\\SAC}}
+  & lr / $\gamma$ / $\tau$ & $3{\cdot}10^{-4}$ / 0.99 / 0.005 \\
+  & critics / UTD & 2 (LayerNorm) / 4 \\
+  & $\alpha$ / entropy & $\alpha_0{=}0.1$ learnt, target $-1$ \\
+  & demo / warmup & 0.5 (0 SAC); 500 steps; 100k total \\
+\midrule
+eval & schedule & 1 ep/track, every 500 ($\leq$10k) / 5k \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 \paragraph{Protocol.}
@@ -135,14 +158,14 @@ When the DAgger run has 20k steps, RLPD is cut at 20k too.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig1_learning.pdf}
-\caption{\textbf{Training track (lighthouse).} Lap time of the evaluation episode vs environment steps; line = median of 5 seeds, band = min--max over seeds; an unfinished lap is drawn at the top. DAgger matches the master (dotted line) from the demo on. RLPD and SAC only reach their first lap at the same time (median 2000 steps, $p=0.88$), but RLPD reaches the master's lap time sooner (median 4500 vs 15000 steps, $p=0.016$); both end at 381 vs 383 steps.}
+\caption{\textbf{Training track (lighthouse).} Lap time of the evaluation episode vs environment steps; point = median lap time of the seeds that finish at this checkpoint, $k/5$ = number of seeds that finish when not all do. DAgger matches the master (dotted line) from the demo on. RLPD and SAC only reach their first lap at the same time (median 2000 steps, $p=0.88$), but RLPD reaches the master's lap time sooner (median 4500 vs 15000 steps, $p=0.016$); both end at 381 vs 383 steps.}
 \label{fig:learning}
 \end{figure}
 
 \Cref{fig:learning} compares RLPD (one demo lap) with SAC only.
 The demos do not help to find the finish line sooner: the first lap comes at the same time.
 They make the agent reach the master's speed about three times sooner, and the mean lap time over the first 10k steps is lower (704 vs 915 steps, unfinished counted 1500, $p=0.07$).
-After a long training there is no big difference (381 vs 383 steps), so the speed of learning is the main gain of symmetric sampling here.
+After a long training there is no big difference (381 vs 383 steps), so \textbf{the speed of learning is the main gain of symmetric sampling} here.
 Both end 8\% faster than the master: this comes from RL, not from the demos (the master is also limited by $\mathrm{Box}(2)$).
 On the test tracks RLPD finishes more often than SAC only (0.25 vs 0.06, $p=0.032$), but both are far below DAgger.
 
@@ -155,9 +178,9 @@ On the test tracks RLPD finishes more often than SAC only (0.25 vs 0.06, $p=0.03
 \label{fig:gen}
 \end{figure*}
 
-\Cref{fig:gen} gives the main result: DAgger generalises much better than RLPD.
+\Cref{fig:gen} gives the main result: \textbf{DAgger generalises much better than RLPD}.
 With team4 on lighthouse, DAgger finishes almost every test evaluation while RLPD finishes about one in four ($p=0.008$, the smallest possible value).
-On the training track it is the opposite: RLPD is faster than the master (381 vs 415 steps), DAgger equals it. But RLPD drives far from the centre of the track (3.3\,m vs 0.74\,m) with a jerky steering (0.21 vs 0.07): it optimises a trajectory specific to the track, while DAgger copies a policy that transfers.
+On the training track it is the opposite: RLPD is faster than the master (381 vs 415 steps), DAgger equals it. But RLPD drives far from the centre of the track (3.3\,m vs 0.74\,m) with a jerky steering (0.21 vs 0.07): it \textbf{optimises a trajectory specific to the track}, while \textbf{DAgger copies a policy that transfers}.
 More training tracks help RLPD (0.25 with 1 track, 0.58 with 4, 0.47 with 16) without closing the gap (DAgger 0.82 and 0.99).
 The normalisation statistics matter for RLPD (0.55 with statistics on 16 tracks vs 0.25) but not for DAgger (1.00 in both cases).
 Eleven times more demos (the clean lap + 10 noisy episodes) do not help RLPD: it reaches the master's lap time later (7500 vs 4500 steps, $p=0.024$) and does not generalise better.
@@ -186,20 +209,20 @@ team4, 11 demo episodes (executed actions) & 5 $\to$ 1 & 33/65 \\
 \end{table}
 
 The environment is deterministic and the student equals the master from the demo on: each DAgger iteration replays the same lap (415 steps on lighthouse) and the final dataset is about 48 copies of the same trajectory.
-The loop has no error state to correct, so what we measure is the generalisation of behaviour cloning, and 100k steps bring nothing more than 20k.
+The loop has no error state to correct, so what we measure is the generalisation of behaviour cloning, and \textbf{100k steps bring nothing more than 20k}.
 \Cref{tab:loop} shows that without noise the loop never improves generalisation and sometimes degrades it (cause not established; possibly overfitting with 200 gradient steps per iteration on nearly duplicated data).
 When noise is added to the executed action, the student visits states off the master's trajectory and the loop helps again (snowtuxpeak: 1 $\to$ 5 seeds); it is not always positive (team1 with $\sigma=0.3$: 0/5).
 The noisy demos given to RLPD store the executed action (master + noise): for DAgger these are biased labels, and relabelling them with the master restores 65/65.
 
 \subsection{Cost}
-A DAgger run of 20k steps takes about 10\,min (local machine); an RLPD run of 100k steps about 3.5\,h (Kaggle, 2 threads). The machines differ, but RLPD costs 10 to 20 times more compute for the same number of environment steps (UTD 4 and the critics).
+A DAgger run of 20k steps takes about 10\,min (local machine); an RLPD run of 100k steps about 3.5\,h (Kaggle, 2 threads) and about 5.8\,h locally (5 runs in parallel, 1 thread each, machine partly shared with other jobs). The machines differ, but RLPD costs 10 to 20 times more compute for the same number of environment steps (UTD 4 and the critics).
 
 \section{Discussion}
 \label{sec:discussion}
 
 \paragraph{Information is not the same.}
 An equal budget in environment steps is not equal information: DAgger queries the master at every step (20k to 100k labels), RLPD only has the demos and the reward.
-This is why DAgger needs a master that is available at training time, while RLPD only needs a dataset and can go beyond the master, which it does on the training track.
+This is why \textbf{DAgger needs a master that is available at training time}, while \textbf{RLPD only needs a dataset} and can go beyond the master, which it does on the training track.
 In our setting the master's policy is a smooth function of the observation, so copying it transfers well; RLPD optimises the reward of one track and overfits it.
 
 \paragraph{Limits.}
